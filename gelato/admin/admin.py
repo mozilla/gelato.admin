@@ -116,8 +116,8 @@ class ApplicationAdmin(admin.ModelAdmin):
 def register():
     # admin.site.register(models.BlacklistedGuid)
     # admin.site.register(models.Feature, FeatureAdmin)
+    admin.site.register(addons.Category, CategoryAdmin)
     admin.site.register(addons.AddonBase, AddonAdmin)
-    # admin.site.register(models.Category, CategoryAdmin)
     # admin.site.register(models.FrozenAddon, FrozenAddonAdmin)
     # admin.site.register(models.CompatOverride, CompatOverrideAdmin)
 

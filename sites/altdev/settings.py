@@ -69,7 +69,7 @@ NOBODY_EMAIL = 'nobody@mozilla.org'
 DATABASES = {
     'default': {
         'NAME': 'zamboni',
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'mysql_pymysql',
         'HOST': '',
         'PORT': '',
         'USER': '',
@@ -303,7 +303,7 @@ MIDDLEWARE_CLASSES = (
 # Auth
 AUTHENTICATION_BACKENDS = (
     'django_browserid.auth.BrowserIDBackend',
-    'users.backends.AmoUserBackend',
+    'gelato.models.users.AmoUserBackend',
     'cake.backends.SessionBackend',
 )
 AUTH_PROFILE_MODULE = 'users.UserProfile'
@@ -319,12 +319,12 @@ INSTALLED_APPS = (
     'versions',
     'users',
     # Third party apps
-    'djcelery',
+    #'djcelery',
     'django_extensions',
     'django_nose',
     'raven.contrib.django',
-    'gunicorn',
-    'piston',
+    #'gunicorn',
+    #'piston',
     'waffle',
 
     # Django contrib apps
@@ -336,9 +336,9 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
 
     # Has to load after auth
-    'django_browserid',
-    'django_statsd',
-    'radagast',
+    #'django_browserid',
+    #'django_statsd',
+    #'radagast',
 )
 
 # These apps will be removed from INSTALLED_APPS in a production environment.
@@ -953,68 +953,68 @@ VALIDATION_FAQ_URL = ('https://wiki.mozilla.org/AMO:Editors/EditorGuide/'
                       'AddonReviews#Step_2:_Automatic_validation')
 
 
-## Celery
-BROKER_HOST = 'localhost'
-BROKER_PORT = 5672
-BROKER_USER = 'zamboni'
-BROKER_PASSWORD = 'zamboni'
-BROKER_VHOST = 'zamboni'
-BROKER_CONNECTION_TIMEOUT = 0.1
-CELERY_RESULT_BACKEND = 'amqp'
-CELERY_IGNORE_RESULT = True
-CELERY_SEND_TASK_ERROR_EMAILS = True
-CELERYD_LOG_LEVEL = logging.INFO
-CELERYD_HIJACK_ROOT_LOGGER = False
-CELERY_IMPORTS = ('lib.video.tasks', 'lib.metrics')
-# We have separate celeryds for processing devhub & images as fast as possible
-# Some notes:
-# - always add routes here instead of @task(queue=<name>)
-# - when adding a queue, be sure to update deploy.py so that it gets restarted
-CELERY_ROUTES = {
-    # Devhub.
-    'devhub.tasks.validator': {'queue': 'devhub'},
-    'devhub.tasks.compatibility_check': {'queue': 'devhub'},
-    'devhub.tasks.fetch_manifest': {'queue': 'devhub'},
-    'devhub.tasks.fetch_icon': {'queue': 'devhub'},
-    'devhub.tasks.file_validator': {'queue': 'devhub'},
-    'devhub.tasks.packager': {'queue': 'devhub'},
+# ## Celery
+# BROKER_HOST = 'localhost'
+# BROKER_PORT = 5672
+# BROKER_USER = 'zamboni'
+# BROKER_PASSWORD = 'zamboni'
+# BROKER_VHOST = 'zamboni'
+# BROKER_CONNECTION_TIMEOUT = 0.1
+# CELERY_RESULT_BACKEND = 'amqp'
+# CELERY_IGNORE_RESULT = True
+# CELERY_SEND_TASK_ERROR_EMAILS = True
+# CELERYD_LOG_LEVEL = logging.INFO
+# CELERYD_HIJACK_ROOT_LOGGER = False
+# CELERY_IMPORTS = ('lib.video.tasks', 'lib.metrics')
+# # We have separate celeryds for processing devhub & images as fast as possible
+# # Some notes:
+# # - always add routes here instead of @task(queue=<name>)
+# # - when adding a queue, be sure to update deploy.py so that it gets restarted
+# CELERY_ROUTES = {
+#     # Devhub.
+#     'devhub.tasks.validator': {'queue': 'devhub'},
+#     'devhub.tasks.compatibility_check': {'queue': 'devhub'},
+#     'devhub.tasks.fetch_manifest': {'queue': 'devhub'},
+#     'devhub.tasks.fetch_icon': {'queue': 'devhub'},
+#     'devhub.tasks.file_validator': {'queue': 'devhub'},
+#     'devhub.tasks.packager': {'queue': 'devhub'},
 
-    # Videos.
-    'lib.video.tasks.resize_video': {'queue': 'devhub'},
+#     # Videos.
+#     'lib.video.tasks.resize_video': {'queue': 'devhub'},
 
-    # Images.
-    'bandwagon.tasks.resize_icon': {'queue': 'images'},
-    'users.tasks.resize_photo': {'queue': 'images'},
-    'users.tasks.delete_photo': {'queue': 'images'},
-    'devhub.tasks.resize_icon': {'queue': 'images'},
-    'devhub.tasks.resize_preview': {'queue': 'images'},
+#     # Images.
+#     'bandwagon.tasks.resize_icon': {'queue': 'images'},
+#     'users.tasks.resize_photo': {'queue': 'images'},
+#     'users.tasks.delete_photo': {'queue': 'images'},
+#     'devhub.tasks.resize_icon': {'queue': 'images'},
+#     'devhub.tasks.resize_preview': {'queue': 'images'},
 
-    # Bulk.
-    'zadmin.tasks.bulk_validate_file': {'queue': 'bulk'},
-    'zadmin.tasks.tally_validation_results': {'queue': 'bulk'},
-    'zadmin.tasks.add_validation_jobs': {'queue': 'bulk'},
-    'zadmin.tasks.notify_success': {'queue': 'bulk'},
-    'zadmin.tasks.notify_failed': {'queue': 'bulk'},
-    'devhub.tasks.flag_binary': {'queue': 'bulk'},
-    'stats.tasks.index_update_counts': {'queue': 'bulk'},
-    'stats.tasks.index_download_counts': {'queue': 'bulk'},
-}
+#     # Bulk.
+#     'zadmin.tasks.bulk_validate_file': {'queue': 'bulk'},
+#     'zadmin.tasks.tally_validation_results': {'queue': 'bulk'},
+#     'zadmin.tasks.add_validation_jobs': {'queue': 'bulk'},
+#     'zadmin.tasks.notify_success': {'queue': 'bulk'},
+#     'zadmin.tasks.notify_failed': {'queue': 'bulk'},
+#     'devhub.tasks.flag_binary': {'queue': 'bulk'},
+#     'stats.tasks.index_update_counts': {'queue': 'bulk'},
+#     'stats.tasks.index_download_counts': {'queue': 'bulk'},
+# }
 
-# This is just a place to store these values, you apply them in your
-# task decorator, for example:
-#   @task(time_limit=CELERY_TIME_LIMITS['lib...']['hard'])
-# Otherwise your task will use the default settings.
-CELERY_TIME_LIMITS = {
-    'lib.video.tasks.resize_video': {'soft': 360, 'hard': 600},
-}
+# # This is just a place to store these values, you apply them in your
+# # task decorator, for example:
+# #   @task(time_limit=CELERY_TIME_LIMITS['lib...']['hard'])
+# # Otherwise your task will use the default settings.
+# CELERY_TIME_LIMITS = {
+#     'lib.video.tasks.resize_video': {'soft': 360, 'hard': 600},
+# }
 
-# When testing, we always want tasks to raise exceptions. Good for sanity.
-CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
+# # When testing, we always want tasks to raise exceptions. Good for sanity.
+# CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
 
-# Time in seconds before celery.exceptions.SoftTimeLimitExceeded is raised.
-# The task can catch that and recover but should exit ASAP. Note that there is
-# a separate, shorter timeout for validation tasks.
-CELERYD_TASK_SOFT_TIME_LIMIT = 60 * 2
+# # Time in seconds before celery.exceptions.SoftTimeLimitExceeded is raised.
+# # The task can catch that and recover but should exit ASAP. Note that there is
+# # a separate, shorter timeout for validation tasks.
+# CELERYD_TASK_SOFT_TIME_LIMIT = 60 * 2
 
 ## Fixture Magic
 CUSTOM_DUMPS = {
