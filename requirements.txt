@@ -2,6 +2,7 @@
 #celery-tasktree==0.3.2
 #django-celery==2.2.4
 dj-database-url==0.2.1
+Django==1.4.3
 django-cache-machine==0.6
 django-extensions==0.9
 django-multidb-router==0.5
