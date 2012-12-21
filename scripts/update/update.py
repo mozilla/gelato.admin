@@ -17,22 +17,20 @@ import commander_settings as settings
 @task
 def create_virtualenv(ctx):
     venv = settings.VIRTUAL_ENV
-    try:
-        try:
-            ctx.local("virtualenv --distribute --never-download %s" % venv)
-        except BadReturnCode:
-            pass # if this is really broken, then the pip install should fail
+    if not venv.startswith('/data'):
+        raise Exception('venv must start with /data') # this is just to avoid rm'ing /
 
-        ctx.local("%s/bin/pip install --exists-action=w --no-deps --no-index "
-                  "--download-cache=/tmp/pip-cache -f %s "
-                  "-r %s/requirements.txt" %
-                    (venv, settings.PYREPO, settings.SRC_DIR))
-    finally:
-        # make sure this always runs
-        ctx.local("rm -f %s/lib/python2.6/no-global-site-packages.txt" % venv)
-        ctx.local("%s/bin/python /usr/bin/virtualenv --relocatable %s"
-                  % (venv, venv))
+    ctx.local('rm -rf %s' % venv)
+    ctx.local('virtualenv --distribute --never-download %s' % venv)
 
+    ctx.local('%s/bin/pip install --exists-action=w --no-deps --no-index '
+              '--download-cache=/tmp/pip-cache -f %s '
+              '-r %s/requirements/prod.txt' %
+              (venv, settings.PYREPO, settings.SRC_DIR))
+
+    # make sure this always runs
+    ctx.local("rm -f %s/lib/python2.6/no-global-site-packages.txt" % venv)
+    ctx.local("%s/bin/python /usr/bin/virtualenv --relocatable %s" % (venv, venv))
 
 @task
 def update_code(ctx, tag):
