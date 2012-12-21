@@ -25,7 +25,7 @@ def create_virtualenv(ctx):
 
     ctx.local('%s/bin/pip install --exists-action=w --no-deps --no-index '
               '--download-cache=/tmp/pip-cache -f %s '
-              '-r %s/requirements/prod.txt' %
+              '-r %s/requirements.txt' %
               (venv, settings.PYREPO, settings.SRC_DIR))
 
     # make sure this always runs
