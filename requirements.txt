@@ -2,6 +2,7 @@
 #celery-tasktree==0.3.2
 #django-celery==2.2.4
 dj-database-url==0.2.1
+django-cache-machine==0.6
 django-extensions==0.9
 django-multidb-router==0.5
 django-nose==1.1
@@ -10,8 +11,10 @@ gunicorn==0.16.1
 metlog-py==0.9.8
 metlog-cef==0.2
 metlog-raven==0.3
+nose==1.2.1
 raven==2.0.6
 PyMySQL==0.5
+tower==0.3.4
 
 
 #-e git://github.com/andymckay/django-radagast@4ea83aa714787a0cc352d39aaed27473139fc9db#egg=django-radagast
