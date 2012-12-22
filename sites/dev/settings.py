@@ -9,7 +9,7 @@ SITE_URL = 'http://%s' % DOMAIN
 STATIC_URL = SITE_URL
 
 DATABASES = {'default': dj_database_url.parse(private.DATABASES_DEFAULT_URL)}
-DATABASES.update({
+DATABASES['default'].update({
     'ENGINE': 'mysql_pymysql',
     'OPTIONS': {'init_command': 'SET storage_engine=InnoDB'},
     'TEST_CHARSET': 'utf8',
